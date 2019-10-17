@@ -75,10 +75,12 @@ const Logic = {
   _previousPanel: null,
   _panels: {},
   _onboardingVariation: null,
+  _colorblindTheme: false,
 
   async init() {
     // Remove browserAction "upgraded" badge when opening panel
     this.clearBrowserActionBadge();
+    this.checkColorblindTheme();
 
     // Retrieve the list of identities.
     const identitiesPromise = this.refreshIdentities();
@@ -120,6 +122,21 @@ const Logic = {
       break;
     }
 
+  },
+
+  async checkColorblindTheme() {
+    this._colorblindTheme = false;
+    const getExtensions = await browser.management.getAll();
+    for (const info of getExtensions) {
+      if (info.type === "theme") {
+        this._colorblindTheme = (info.name === "Colorblind colors for multi-account-containers" && info.enabled === true);
+      }
+    }
+  },
+
+  checkContainerColor(color){
+    if (this._colorblindTheme && color !== "default-tab") {color = "colorblind-" + color;}
+    return color;
   },
 
   async showAchievementOrContainersListPanel() {
@@ -639,7 +656,7 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
       const currentContainer = document.getElementById("current-container");
       currentContainer.innerText = identity.name;
 
-      currentContainer.setAttribute("data-identity-color", identity.color);
+      currentContainer.setAttribute("data-identity-color", Logic.checkContainerColor(identity.color));
     }
   },
 
@@ -666,7 +683,7 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
         <div class="userContext-icon-wrapper open-newtab">
           <div class="usercontext-icon"
             data-identity-icon="${identity.icon}"
-            data-identity-color="${identity.color}">
+            data-identity-color="${Logic.checkContainerColor(identity.color)}">
           </div>
         </div>
         <div class="container-name truncate-text"></div>`;
@@ -795,7 +812,7 @@ Logic.registerPanel(P_CONTAINER_INFO, {
 
     const icon = document.getElementById("container-info-icon");
     icon.setAttribute("data-identity-icon", identity.icon);
-    icon.setAttribute("data-identity-color", identity.color);
+    icon.setAttribute("data-identity-color", Logic.checkContainerColor(identity.color));
 
     // Show or not the has-tabs section.
     for (let trHasTabs of document.getElementsByClassName("container-info-has-tabs")) { // eslint-disable-line prefer-const
@@ -899,7 +916,7 @@ Logic.registerPanel(P_CONTAINERS_EDIT, {
           <div class="userContext-icon-wrapper">
             <div class="usercontext-icon"
               data-identity-icon="${identity.icon}"
-              data-identity-color="${identity.color}">
+              data-identity-color="${Logic.checkContainerColor(identity.color)}">
             </div>
           </div>
           <div class="container-name truncate-text"></div>
@@ -945,9 +962,9 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
   panelSelector: "#edit-container-panel",
 
   // This method is called when the object is registered.
-  initialize() {
+  async initialize() {
+    await Logic.checkColorblindTheme();
     this.initializeRadioButtons();
-
     Logic.addEnterHandler(document.querySelector("#edit-container-panel-back-arrow"), () => {
       const formValues = new FormData(this._editForm);
       if (formValues.get("container-id") !== NEW_CONTAINER_ID) {
@@ -972,8 +989,6 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     this._editForm.addEventListener("submit", () => {
       this._submitForm();
     });
-
-
   },
 
   async _submitForm() {
@@ -1052,7 +1067,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
       const templateInstance = document.createElement("div");
       templateInstance.classList.add("radio-container");
       // eslint-disable-next-line no-unsanitized/property
-      templateInstance.innerHTML = colorRadioTemplate(containerColor);
+      templateInstance.innerHTML = colorRadioTemplate(Logic.checkContainerColor(containerColor));
       colorRadioFieldset.appendChild(templateInstance);
     });
 
@@ -1144,7 +1159,7 @@ Logic.registerPanel(P_CONTAINER_DELETE, {
 
     const icon = document.getElementById("delete-container-icon");
     icon.setAttribute("data-identity-icon", identity.icon);
-    icon.setAttribute("data-identity-color", identity.color);
+    icon.setAttribute("data-identity-color", Logic.checkContainerColor(identity.color));
 
     return Promise.resolve(null);
   },

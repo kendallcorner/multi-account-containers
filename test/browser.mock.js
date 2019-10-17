@@ -87,7 +87,8 @@ module.exports = () => {
       },
       onUninstalled: {
         addListener: sinon.stub()
-      }
+      },
+      getAll: sinon.stub().returns([])
     },
     extension: {
       getURL: sinon.stub().returns("moz-extension://multi-account-containers/confirm-page.html")

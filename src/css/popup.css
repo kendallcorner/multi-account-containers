@@ -971,3 +971,43 @@ span ~ .panel-header-text {
 .amo-rate-cta {
   background: #0f1126;
 }
+
+[data-identity-color="colorblind-blue"] {
+  --identity-tab-color: #0072b2;
+  --identity-icon-color: #0072b2;
+}
+
+[data-identity-color="colorblind-turquoise"] {
+  --identity-tab-color: #56b4e9;
+  --identity-icon-color: #56b4e9;
+}
+
+[data-identity-color="colorblind-green"] {
+  --identity-tab-color: #009e73;
+  --identity-icon-color: #009e73;
+}
+
+[data-identity-color="colorblind-yellow"] {
+  --identity-tab-color: #f0e442;
+  --identity-icon-color: #f0e442;
+}
+
+[data-identity-color="colorblind-orange"] {
+  --identity-tab-color: #e69f00;
+  --identity-icon-color: #e69f00;
+}
+
+[data-identity-color="colorblind-red"] {
+  --identity-tab-color: #d55e00;
+  --identity-icon-color: #d55e00;
+}
+
+[data-identity-color="colorblind-pink"] {
+  --identity-tab-color: #000;
+  --identity-icon-color: #000;
+}
+
+[data-identity-color="colorblind-purple"] {
+  --identity-tab-color: #cc79a7;
+  --identity-icon-color: #cc79a7;
+}
