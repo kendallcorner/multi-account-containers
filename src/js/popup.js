@@ -30,41 +30,6 @@ const P_CONTAINER_EDIT = "containerEdit";
 const P_CONTAINER_DELETE = "containerDelete";
 const P_CONTAINERS_ACHIEVEMENT = "containersAchievement";
 
-/**
- * Escapes any occurances of &, ", <, > or / with XML entities.
- *
- * @param {string} str
- *        The string to escape.
- * @return {string} The escaped string.
- */
-function escapeXML(str) {
-  const replacements = { "&": "&amp;", "\"": "&quot;", "'": "&apos;", "<": "&lt;", ">": "&gt;", "/": "&#x2F;" };
-  return String(str).replace(/[&"'<>/]/g, m => replacements[m]);
-}
-
-/**
- * A tagged template function which escapes any XML metacharacters in
- * interpolated values.
- *
- * @param {Array<string>} strings
- *        An array of literal strings extracted from the templates.
- * @param {Array} values
- *        An array of interpolated values extracted from the template.
- * @returns {string}
- *        The result of the escaped values interpolated with the literal
- *        strings.
- */
-function escaped(strings, ...values) {
-  const result = [];
-
-  for (const [i, string] of strings.entries()) {
-    result.push(string);
-    if (i < values.length)
-      result.push(escapeXML(values[i]));
-  }
-
-  return result.join("");
-}
 
 async function getExtensionInfo() {
   const manifestPath = browser.extension.getURL("manifest.json");
@@ -693,7 +658,7 @@ Logic.registerPanel(P_CONTAINERS_LIST, {
       const td = document.createElement("td");
       const openTabs = identity.numberOfOpenTabs || "" ;
 
-      td.innerHTML = escaped`          
+      td.innerHTML = Utils.escaped`          
         <div class="menu-icon">
           <div class="usercontext-icon"
             data-identity-icon="${identity.icon}"
@@ -844,7 +809,7 @@ Logic.registerPanel(P_CONTAINER_INFO, {
       const tr = document.createElement("tr");
       fragment.appendChild(tr);
       tr.classList.add("container-info-tab-row");
-      tr.innerHTML = escaped`
+      tr.innerHTML = Utils.escaped`
         <td></td>
         <td class="container-info-tab-title truncate-text" title="${tab.url}" ><div class="container-tab-title">${tab.title}</div></td>`;
       tr.querySelector("td").appendChild(Utils.createFavIconElement(tab.favIconUrl));
@@ -957,7 +922,7 @@ Logic.registerPanel(P_CONTAINER_PICKER, {
       tr.classList.add("menu-item");
       const td = document.createElement("td");
 
-      td.innerHTML = escaped`          
+      td.innerHTML = Utils.escaped`          
         <div class="menu-icon">
           <div class="usercontext-icon"
             data-identity-icon="${identity.icon}"
@@ -1061,7 +1026,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
         /* As we don't have the full or correct path the best we can assume is the path is HTTPS and then replace with a broken icon later if it doesn't load.
            This is pending a better solution for favicons from web extensions */
         const assumedUrl = `https://${site.hostname}/favicon.ico`;
-        trElement.innerHTML = escaped`
+        trElement.innerHTML = Utils.escaped`
         <div class="favicon"></div>
         <div title="${site.hostname}" class="truncate-text hostname">
           ${site.hostname}
@@ -1090,7 +1055,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
 
   initializeRadioButtons() {
     const colorRadioTemplate = (containerColor) => {
-      return escaped`<input type="radio" value="${containerColor}" name="container-color" id="edit-container-panel-choose-color-${containerColor}" />
+      return Utils.escaped`<input type="radio" value="${containerColor}" name="container-color" id="edit-container-panel-choose-color-${containerColor}" />
      <label for="edit-container-panel-choose-color-${containerColor}" class="usercontext-icon choose-color-icon" data-identity-icon="circle" data-identity-color="${containerColor}">`;
     };
     const colors = ["blue", "turquoise", "green", "yellow", "orange", "red", "pink", "purple"];
@@ -1104,7 +1069,7 @@ Logic.registerPanel(P_CONTAINER_EDIT, {
     });
 
     const iconRadioTemplate = (containerIcon) => {
-      return escaped`<input type="radio" value="${containerIcon}" name="container-icon" id="edit-container-panel-choose-icon-${containerIcon}" />
+      return Utils.escaped`<input type="radio" value="${containerIcon}" name="container-icon" id="edit-container-panel-choose-icon-${containerIcon}" />
      <label for="edit-container-panel-choose-icon-${containerIcon}" class="usercontext-icon choose-color-icon" data-identity-color="grey" data-identity-icon="${containerIcon}">`;
     };
     const icons = ["fingerprint", "briefcase", "dollar", "cart", "vacation", "gift", "food", "fruit", "pet", "tree", "chill", "circle"];
